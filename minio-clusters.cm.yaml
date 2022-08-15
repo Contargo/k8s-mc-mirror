@@ -1,0 +1,10 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: minio-clusters
+data:
+  SOURCE_ALIAS: # Add the alias here, like `minio-cluster-old`
+  SOURCE_SERVER: # Add the server here, make sure to use an appropriate schema like https://minio.cluster.cloud:9000
+  DESTINATION_ALIAS: # Add the alias here, like `minio-cluster-new`
+  DESTINATION_SERVER: # Add the server here, make sure to use an appropriate schema like https://minio.cluster.cloud:9000

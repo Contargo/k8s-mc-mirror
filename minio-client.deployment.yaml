@@ -1,0 +1,71 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio-client
+  labels:
+    app: minio-client
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio-client
+  template:
+    metadata:
+      labels:
+        app: minio-client
+    spec:
+      containers:
+      - name: minio-client
+        image: bitnami/minio-client:2022.8.11
+        imagePullPolicy: IfNotPresent
+        entrypoint:
+        command:
+        - /bin/bash
+        - -c
+        args:
+        - |
+          mc alias set $SOURCE_ALIAS $SOURCE_SERVER $SOURCE_ROOT_USER $SOURCE_ROOT_PASSWORD
+          mc alias set $DESTINATION_ALIAS $DESTINATION_SERVER $DESTINATION_ROOT_USER $DESTINATION_ROOT_PASSWORD
+          mc mirror --fake $SOURCE_ALIAS $DESTINATION_ALIAS
+        env:
+        - name: SOURCE_ALIAS
+          valueFrom:
+            configMapKeyRef:
+              name: minio-clusters
+              key: SOURCE_ALIAS
+        - name: SOURCE_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: minio-clusters
+              key: SOURCE_SERVER
+        - name: SOURCE_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: minio-source-admin
+              key: root-user
+        - name: SOURCE_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: minio-source-admin
+              key: root-password
+        - name: DESTINATION_ALIAS
+          valueFrom:
+            configMapKeyRef:
+              name: minio-clusters
+              key: DESTINATION_ALIAS
+        - name: DESTINATION_SERVER
+          valueFrom:
+            configMapKeyRef:
+              name: minio-clusters
+              key: DESTINATION_SERVER
+        - name: DESTINATION_ROOT_USER
+          valueFrom:
+            secretKeyRef:
+              name: minio-dest-admin
+              key: root-user
+        - name: DESTINATION_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: minio-dest-admin
+              key: root-password
